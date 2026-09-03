@@ -2604,12 +2604,13 @@ initBookingSystem();
   }
   window.addEventListener('resize', onResize, { passive: true });
 
-  // Step item click to scroll smoothly to corresponding client position
+  // Step item click targets: scrolls to the comfortable resting plateau for each client
+  const targetPlateaus = [0.05, 0.50, 0.92];
   stepItems.forEach((item, i) => {
     item.addEventListener('click', () => {
       const rect = container.getBoundingClientRect();
       const totalScrollable = container.offsetHeight - window.innerHeight;
-      const targetY = window.scrollY + rect.top + (i / 2) * totalScrollable;
+      const targetY = window.scrollY + rect.top + targetPlateaus[i] * totalScrollable;
       window.scrollTo({ top: targetY, behavior: 'smooth' });
     });
   });
@@ -2624,31 +2625,51 @@ initBookingSystem();
     const scrollY = -rect.top;
     const rawProgress = Math.max(0, Math.min(1, scrollY / totalScrollable));
 
-    // Update active client card based on scroll position
-    if (rawProgress < 0.35) {
-      updateCard(0);
-    } else if (rawProgress < 0.70) {
-      updateCard(1);
-    } else {
-      updateCard(2);
-    }
+    if (!material1 || !material2 || loadedTextures.length < 3) return;
 
-    if (!material1 || !material2) return;
+    let progress = 0.0;
+    let texFront = loadedTextures[0];
+    let texBack = loadedTextures[1];
+    let activeCard = 0;
 
-    let progress, texFront, texBack;
+    // ── PERFECTED SCROLL RUNWAY WITH BUILT-IN RESTING BUFFER ──
+    // Stage 1: 0.00 - 0.12 -> Client 1 (Pop Diaries) at rest
+    // Trans 1: 0.12 - 0.42 -> Smooth dissolve Pop Diaries into MyRevue
+    // Stage 2: 0.42 - 0.58 -> Client 2 (MyRevue) at rest in full color
+    // Trans 2: 0.58 - 0.88 -> Smooth dissolve MyRevue into theweekendyogi
+    // Stage 3: 0.88 - 1.00 -> Client 3 (theweekendyogi) 100% finished & at rest!
+    // -> Only after scrolling past the full finish does the section unpin!
 
-    // Two-stage transition across 3 clients:
-    // Stage 1 (0 to 0.5): Pop Diaries -> MyRevue
-    // Stage 2 (0.5 to 1.0): MyRevue -> theweekendyogi
-    if (rawProgress < 0.5) {
-      progress = rawProgress / 0.5;
+    if (rawProgress < 0.12) {
+      activeCard = 0;
       texFront = loadedTextures[0];
       texBack = loadedTextures[1];
-    } else {
-      progress = (rawProgress - 0.5) / 0.5;
+      progress = 0.0;
+    } else if (rawProgress < 0.42) {
+      const sub = (rawProgress - 0.12) / (0.42 - 0.12);
+      activeCard = sub < 0.5 ? 0 : 1;
+      texFront = loadedTextures[0];
+      texBack = loadedTextures[1];
+      progress = sub;
+    } else if (rawProgress < 0.58) {
+      activeCard = 1;
       texFront = loadedTextures[1];
       texBack = loadedTextures[2];
+      progress = 0.0;
+    } else if (rawProgress < 0.88) {
+      const sub = (rawProgress - 0.58) / (0.88 - 0.58);
+      activeCard = sub < 0.5 ? 1 : 2;
+      texFront = loadedTextures[1];
+      texBack = loadedTextures[2];
+      progress = sub;
+    } else {
+      activeCard = 2;
+      texFront = loadedTextures[2];
+      texBack = loadedTextures[2];
+      progress = 0.0; // 100% completed & resting before section unpins
     }
+
+    updateCard(activeCard);
 
     if (material1.uniforms.uTexture.value !== texFront) {
       material1.uniforms.uTexture.value = texFront;
