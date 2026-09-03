@@ -4877,6 +4877,410 @@ a:focus-visible, button:focus-visible {
   .pc-card__cta { padding: 8px 12px; font-size: 11px; }
   .pc-controls { bottom: 12px; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   PORTFOLIO (WORK) 3D PERSPECTIVE CAROUSEL
+   ══════════════════════════════════════════════════════════ */
+.work {
+  position: relative;
+  overflow: hidden;
+  padding: 96px 0;
+}
+.work__header {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 40px 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.work__header-text {
+  max-width: 620px;
+}
+.work__headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(34px, 4.2vw, 56px);
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--charcoal);
+  margin: 12px 0 10px;
+}
+.work__headline em {
+  font-style: italic;
+  font-weight: 300;
+}
+.work__sub {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #4a4a4a;
+  margin: 0;
+  font-weight: 400;
+}
+.work__header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-s);
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  box-shadow: var(--shadow-sm);
+}
+.work__live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E11D48;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.2);
+  display: inline-block;
+}
+
+/* 3D Stage Container */
+.work-carousel {
+  position: relative;
+  width: 100%;
+  height: 590px;
+  overflow: hidden;
+  user-select: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(244, 243, 239, 0.90) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+.work-pc-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.22;
+}
+.work-pc-orb--1 {
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, #fde047 0%, #cbd5e1 70%);
+  top: -80px;
+  right: 12%;
+}
+.work-pc-orb--2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, #67e8f9 0%, #e2e8f0 70%);
+  bottom: -60px;
+  left: 10%;
+}
+
+/* 3D Viewport - Stops 74px before bottom so controls sit completely clear */
+.work-pc-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 74px;
+  overflow: hidden;
+  perspective: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.work-pc-track {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(var(--wtx, 0px), -50%);
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.work-pc-slide {
+  flex-shrink: 0;
+  width: 530px;
+  perspective: 1200px;
+  padding: 0 14px;
+  box-sizing: border-box;
+}
+.work-pc-card-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  cursor: pointer;
+}
+.work-pc-card {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.work-pc-card:hover {
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+/* Card Header */
+.work-pc-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #fcfbfa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.work-pc-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.work-pc-card__num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--charcoal);
+  letter-spacing: -0.02em;
+}
+.work-pc-card__title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.01em;
+}
+.work-pc-card__date {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.work-pc-card__date--featured {
+  background: rgba(225, 29, 72, 0.08);
+  color: #E11D48;
+  border-color: rgba(225, 29, 72, 0.2);
+}
+
+/* Card Video Embed (16:9) */
+.work-pc-card__embed {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #0d0d10;
+  overflow: hidden;
+}
+.work-pc-card__embed iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Inactive Overlay - allows clicking side cards to center them without iframe stealing click */
+.work-pc-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 5;
+  transition: opacity 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.work-pc-card__play-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.work-pc-slide.pc-active .work-pc-card__overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+.work-pc-slide:not(.pc-active) .work-pc-card__overlay {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Card Footer with Highlights & Tags */
+.work-pc-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  gap: 12px;
+}
+.work-pc-card__desc {
+  font-size: 12px;
+  color: #333333;
+  margin: 0;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.work-pc-card__chips {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.work-pc-chip {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #555555;
+  background: #f7f6f2;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+/* Label Below Card */
+.work-pc-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111111;
+  white-space: nowrap;
+  margin: 0;
+  letter-spacing: -0.01em;
+  transition: filter 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Navigation Controls Bar */
+.work-pc-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 7px 18px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  color: #111111;
+}
+.work-pc-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f3f0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #111111;
+  cursor: pointer;
+  transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s var(--ease-spring);
+}
+.work-pc-btn:hover:not(:disabled) {
+  background: #e5e4de;
+  transform: scale(1.08);
+}
+.work-pc-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.work-pc-btn:disabled {
+  opacity: 0.30;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.work-pc-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.work-pc-dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 4px;
+  background: #111111;
+  opacity: 0.22;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, background 0.35s ease;
+}
+.work-pc-dot--active {
+  width: 28px;
+  opacity: 1;
+}
+.work-pc-counter {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #444444;
+  letter-spacing: 0.04em;
+  padding-left: 2px;
+}
+
+/* Responsive adjustments for Work Carousel */
+@media (max-width: 1024px) {
+  .work-carousel { height: 560px; }
+  .work-pc-slide { width: 470px; }
+  .work-pc-viewport { bottom: 70px; }
+}
+@media (max-width: 768px) {
+  .work { padding: 64px 0; }
+  .work__header { padding: 0 24px 36px; margin-bottom: 0; }
+  .work-carousel { height: 490px; border-radius: var(--radius); }
+  .work-pc-viewport { bottom: 66px; }
+  .work-pc-slide { width: 360px; }
+  .work-pc-card__footer { display: none; }
+  .work-pc-label { font-size: 12.5px; }
+  .work-pc-controls { bottom: 14px; gap: 10px; padding: 6px 14px; }
+  .work-pc-btn { width: 32px; height: 32px; }
+}
+@media (max-width: 480px) {
+  .work { padding: 52px 0; }
+  .work__header { padding: 0 16px 28px; }
+  .work-carousel { height: 440px; }
+  .work-pc-viewport { bottom: 62px; }
+  .work-pc-slide { width: 290px; }
+  .work-pc-card__header { padding: 10px 14px; }
+  .work-pc-card__title { font-size: 13.5px; }
+  .work-pc-controls { bottom: 12px; }
+}
 </style>
 </head>
 <body>
@@ -5349,64 +5753,179 @@ a:focus-visible, button:focus-visible {
 <!-- ── WORK / PORTFOLIO ── -->
 <section class="work" id="work">
   <div class="work__header">
-    <span class="label reveal">Portfolio</span>
-    <h2 class="work__headline reveal reveal-delay-1">Selected <em>Work</em></h2>
-    <p class="work__sub reveal reveal-delay-2">A curated showcase of creative video editing projects.</p>
+    <div class="work__header-text">
+      <span class="label reveal">Portfolio</span>
+      <h2 class="work__headline reveal reveal-delay-1">Selected <em>Work</em></h2>
+      <p class="work__sub reveal reveal-delay-2">A curated showcase of creative video editing projects. Swipe through and play any showcase.</p>
+    </div>
+    <div class="work__header-badge reveal reveal-delay-2">
+      <span class="work__live-dot"></span>
+      <span>4 Featured Projects</span>
+    </div>
   </div>
-  <div class="work__grid">
-    <div class="video-card reveal" data-tilt>
-      <div class="video-card__shine"></div>
-      <div class="video-card__header">
-        <div class="video-card__meta">
-          <span class="video-card__num">01</span>
-          <span class="video-card__title">Personal Showcase</span>
+
+  <div class="work-carousel reveal" id="work-carousel" role="region" aria-roledescription="carousel" aria-label="Perspective video portfolio carousel" tabindex="0">
+    
+    <!-- Ambient glow orbs -->
+    <div class="work-pc-orb work-pc-orb--1"></div>
+    <div class="work-pc-orb work-pc-orb--2"></div>
+
+    <div class="work-pc-viewport">
+      <div class="work-pc-track" id="work-pc-track">
+
+        <!-- 01. PERSONAL SHOWCASE -->
+        <div class="work-pc-slide pc-active" data-index="0">
+          <div class="work-pc-card-wrap">
+            <div class="work-pc-card">
+              <div class="work-pc-card__header">
+                <div class="work-pc-card__meta">
+                  <span class="work-pc-card__num">01</span>
+                  <span class="work-pc-card__title">Personal Showcase</span>
+                </div>
+                <span class="work-pc-card__date work-pc-card__date--featured">✦ Signature Edit</span>
+              </div>
+              <div class="work-pc-card__embed">
+                <iframe src="https://drive.google.com/file/d/1Pm9GA9vAV6KOG8jXqT3t4gN-sNPlQ5pe/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                <div class="work-pc-card__overlay">
+                  <div class="work-pc-card__play-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Click to Focus &amp; Play</span>
+                  </div>
+                </div>
+              </div>
+              <div class="work-pc-card__footer">
+                <p class="work-pc-card__desc">Dynamic storytelling, precision pacing &amp; cinematic color grading.</p>
+                <div class="work-pc-card__chips">
+                  <span class="work-pc-chip">Color Grading</span>
+                  <span class="work-pc-chip">Motion Design</span>
+                </div>
+              </div>
+            </div>
+            <p class="work-pc-label">01 · Personal Showcase (Signature Project)</p>
+          </div>
         </div>
-        <span class="video-card__date">✦ Your Next Project?</span>
-      </div>
-      <div class="video-card__embed">
-        <iframe src="https://drive.google.com/file/d/1Pm9GA9vAV6KOG8jXqT3t4gN-sNPlQ5pe/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
-      </div>
-    </div>
-    <div class="video-card reveal reveal-delay-1" data-tilt>
-      <div class="video-card__shine"></div>
-      <div class="video-card__header">
-        <div class="video-card__meta">
-          <span class="video-card__num">02</span>
-          <span class="video-card__title">Client Project</span>
+
+        <!-- 02. CLIENT PROJECT 1 -->
+        <div class="work-pc-slide" data-index="1">
+          <div class="work-pc-card-wrap">
+            <div class="work-pc-card">
+              <div class="work-pc-card__header">
+                <div class="work-pc-card__meta">
+                  <span class="work-pc-card__num">02</span>
+                  <span class="work-pc-card__title">Client Project</span>
+                </div>
+                <span class="work-pc-card__date">September 2026</span>
+              </div>
+              <div class="work-pc-card__embed">
+                <iframe src="https://drive.google.com/file/d/1iGBtY4UnSqosCDhX30pQscC9stYDMbDi/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                <div class="work-pc-card__overlay">
+                  <div class="work-pc-card__play-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Click to Focus &amp; Play</span>
+                  </div>
+                </div>
+              </div>
+              <div class="work-pc-card__footer">
+                <p class="work-pc-card__desc">Commercial pacing, sound mastering &amp; visual hook architecture.</p>
+                <div class="work-pc-card__chips">
+                  <span class="work-pc-chip">Commercial</span>
+                  <span class="work-pc-chip">Sound Design</span>
+                </div>
+              </div>
+            </div>
+            <p class="work-pc-label">02 · Client Project (Commercial Showcase)</p>
+          </div>
         </div>
-        <span class="video-card__date">September 2026</span>
-      </div>
-      <div class="video-card__embed">
-        <iframe src="https://drive.google.com/file/d/1iGBtY4UnSqosCDhX30pQscC9stYDMbDi/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
-      </div>
-    </div>
-    <div class="video-card reveal reveal-delay-2" data-tilt>
-      <div class="video-card__shine"></div>
-      <div class="video-card__header">
-        <div class="video-card__meta">
-          <span class="video-card__num">03</span>
-          <span class="video-card__title">Client Project</span>
+
+        <!-- 03. CLIENT PROJECT 2 -->
+        <div class="work-pc-slide" data-index="2">
+          <div class="work-pc-card-wrap">
+            <div class="work-pc-card">
+              <div class="work-pc-card__header">
+                <div class="work-pc-card__meta">
+                  <span class="work-pc-card__num">03</span>
+                  <span class="work-pc-card__title">Client Project</span>
+                </div>
+                <span class="work-pc-card__date">September 2026</span>
+              </div>
+              <div class="work-pc-card__embed">
+                <iframe src="https://drive.google.com/file/d/1DIQ6bYt4E-wZXs9OUUnpj7oFQrT0B4aW/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                <div class="work-pc-card__overlay">
+                  <div class="work-pc-card__play-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Click to Focus &amp; Play</span>
+                  </div>
+                </div>
+              </div>
+              <div class="work-pc-card__footer">
+                <p class="work-pc-card__desc">Engaging narrative rhythm with custom transitions &amp; VFX polish.</p>
+                <div class="work-pc-card__chips">
+                  <span class="work-pc-chip">VFX &amp; Polish</span>
+                  <span class="work-pc-chip">Transitions</span>
+                </div>
+              </div>
+            </div>
+            <p class="work-pc-label">03 · Client Project (Narrative Showcase)</p>
+          </div>
         </div>
-        <span class="video-card__date">September 2026</span>
-      </div>
-      <div class="video-card__embed">
-        <iframe src="https://drive.google.com/file/d/1DIQ6bYt4E-wZXs9OUUnpj7oFQrT0B4aW/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
-      </div>
-    </div>
-    <div class="video-card reveal reveal-delay-3" data-tilt>
-      <div class="video-card__shine"></div>
-      <div class="video-card__header">
-        <div class="video-card__meta">
-          <span class="video-card__num">04</span>
-          <span class="video-card__title">Client Project</span>
+
+        <!-- 04. CLIENT PROJECT 3 -->
+        <div class="work-pc-slide" data-index="3">
+          <div class="work-pc-card-wrap">
+            <div class="work-pc-card">
+              <div class="work-pc-card__header">
+                <div class="work-pc-card__meta">
+                  <span class="work-pc-card__num">04</span>
+                  <span class="work-pc-card__title">Client Project</span>
+                </div>
+                <span class="work-pc-card__date">September 2026</span>
+              </div>
+              <div class="work-pc-card__embed">
+                <iframe src="https://drive.google.com/file/d/18kabBZzAGecTdjmu6W9kRfJc5afTgZuh/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
+                <div class="work-pc-card__overlay">
+                  <div class="work-pc-card__play-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Click to Focus &amp; Play</span>
+                  </div>
+                </div>
+              </div>
+              <div class="work-pc-card__footer">
+                <p class="work-pc-card__desc">Cinematic rhythm blending branded messaging with high retention.</p>
+                <div class="work-pc-card__chips">
+                  <span class="work-pc-chip">Social Format</span>
+                  <span class="work-pc-chip">Branding</span>
+                </div>
+              </div>
+            </div>
+            <p class="work-pc-label">04 · Client Project (Creative Showcase)</p>
+          </div>
         </div>
-        <span class="video-card__date">September 2026</span>
+
+      </div><!-- /work-pc-track -->
+    </div><!-- /work-pc-viewport -->
+
+    <!-- Navigation Controls Bar -->
+    <div class="work-pc-controls" aria-label="Portfolio carousel navigation">
+      <button type="button" class="work-pc-btn work-pc-btn--prev" aria-label="Show previous project">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <div class="work-pc-dots">
+        <button type="button" class="work-pc-dot work-pc-dot--active" aria-label="Project 1: Personal Showcase" aria-current="true" data-index="0"></button>
+        <button type="button" class="work-pc-dot" aria-label="Project 2: Client Project" aria-current="false" data-index="1"></button>
+        <button type="button" class="work-pc-dot" aria-label="Project 3: Client Project" aria-current="false" data-index="2"></button>
+        <button type="button" class="work-pc-dot" aria-label="Project 4: Client Project" aria-current="false" data-index="3"></button>
       </div>
-      <div class="video-card__embed">
-        <iframe src="https://drive.google.com/file/d/18kabBZzAGecTdjmu6W9kRfJc5afTgZuh/preview" allowfullscreen loading="lazy" sandbox="allow-scripts allow-same-origin allow-presentation"></iframe>
-      </div>
+
+      <span class="work-pc-counter" id="work-pc-counter">01 / 04</span>
+
+      <button type="button" class="work-pc-btn work-pc-btn--next" aria-label="Show next project">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
-  </div></section>
+
+  </div><!-- /work-carousel -->
+</section>
 
 
 <!-- ── TOOLS ── -->

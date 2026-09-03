@@ -1428,3 +1428,155 @@ initBookingSystem();
   // Initial render
   update();
 })();
+
+// ── WORK (PORTFOLIO) 3D PERSPECTIVE CAROUSEL CONTROLLER ──
+(function () {
+  const carousel = document.getElementById('work-carousel');
+  if (!carousel) return;
+
+  const track = carousel.querySelector('#work-pc-track');
+  const slides = Array.from(carousel.querySelectorAll('.work-pc-slide'));
+  const prevBtn = carousel.querySelector('.work-pc-btn--prev');
+  const nextBtn = carousel.querySelector('.work-pc-btn--next');
+  const dots = Array.from(carousel.querySelectorAll('.work-pc-dot'));
+  const counter = carousel.querySelector('#work-pc-counter');
+
+  if (!track || slides.length === 0) return;
+
+  let currentIndex = 0;
+  const total = slides.length;
+  const loop = false;
+
+  function getSlideWidth() {
+    return slides[0].getBoundingClientRect().width || (window.innerWidth <= 480 ? 290 : window.innerWidth <= 768 ? 360 : 530);
+  }
+
+  function getRotationStep() {
+    if (window.innerWidth <= 480) return 20;
+    if (window.innerWidth <= 768) return 28;
+    return 36;
+  }
+
+  function update() {
+    const slideWidth = getSlideWidth();
+    const rotationStep = getRotationStep();
+    const inactiveScale = window.innerWidth <= 480 ? 0.90 : 0.86;
+
+    // Center active slide horizontally via CSS variable --wtx
+    const translateX = -(currentIndex * slideWidth + slideWidth / 2);
+    track.style.setProperty('--wtx', `${translateX}px`);
+
+    slides.forEach((slide, index) => {
+      const inner = slide.querySelector('.work-pc-card-wrap');
+      const label = slide.querySelector('.work-pc-label');
+      const isActive = index === currentIndex;
+      const diff = currentIndex - index;
+      const rotateY = diff * rotationStep;
+      const scale = isActive ? 1 : inactiveScale;
+      const zIndex = 10 - Math.abs(diff);
+      const opacity = isActive ? 1 : Math.max(0.70, 1 - Math.abs(diff) * 0.20);
+
+      slide.classList.toggle('pc-active', isActive);
+
+      if (inner) {
+        inner.style.transform = `rotateY(${rotateY}deg) scale(${scale})`;
+        inner.style.zIndex = zIndex;
+        inner.style.opacity = opacity;
+      }
+
+      if (label) {
+        label.style.filter = isActive ? 'blur(0px)' : 'blur(2px)';
+        label.style.opacity = isActive ? '1' : '0';
+      }
+    });
+
+    // Update dots
+    dots.forEach((dot, index) => {
+      const isActive = index === currentIndex;
+      dot.classList.toggle('work-pc-dot--active', isActive);
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+
+    // Update counter
+    if (counter) {
+      counter.textContent = String(currentIndex + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    }
+
+    // Update button states
+    if (!loop) {
+      if (prevBtn) prevBtn.disabled = currentIndex === 0;
+      if (nextBtn) nextBtn.disabled = currentIndex === total - 1;
+    }
+  }
+
+  function selectSlide(nextIndex) {
+    if (loop) {
+      currentIndex = ((nextIndex % total) + total) % total;
+    } else {
+      currentIndex = Math.max(0, Math.min(nextIndex, total - 1));
+    }
+    update();
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectSlide(currentIndex - 1);
+  });
+
+  if (nextBtn) nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectSlide(currentIndex + 1);
+  });
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectSlide(index);
+    });
+  });
+
+  slides.forEach((slide, index) => {
+    slide.addEventListener('click', (e) => {
+      if (currentIndex !== index) {
+        e.preventDefault();
+        selectSlide(index);
+      }
+    });
+  });
+
+  // Touch Swipe with deliberate horizontal threshold
+  let sx = 0, sy = 0, isTouching = false;
+  carousel.addEventListener('touchstart', (e) => {
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    isTouching = true;
+  }, { passive: true });
+
+  carousel.addEventListener('touchend', (e) => {
+    if (!isTouching) return;
+    isTouching = false;
+    const dx = sx - e.changedTouches[0].clientX;
+    const dy = Math.abs(sy - e.changedTouches[0].clientY);
+    if (Math.abs(dx) > 55 && Math.abs(dx) > dy * 1.5) {
+      selectSlide(dx > 0 ? currentIndex + 1 : currentIndex - 1);
+    }
+  }, { passive: true });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    const rect = carousel.getBoundingClientRect();
+    if (rect.top > window.innerHeight || rect.bottom < 0) return;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      selectSlide(currentIndex - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      selectSlide(currentIndex + 1);
+    }
+  });
+
+  window.addEventListener('resize', update, { passive: true });
+
+  // Initial render
+  update();
+})();
