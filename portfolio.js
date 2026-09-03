@@ -2701,3 +2701,90 @@ initBookingSystem();
     renderer.render(scene, camera);
   }
 })();
+
+// ════════════════════════════════════════════════════════════
+// STATS COUNTER CONTROLLER (Matching Framer Motion StatsCounter)
+// ════════════════════════════════════════════════════════════
+function initStatsCounters() {
+  const elements = Array.from(document.querySelectorAll('[data-stat-value]'));
+  if (elements.length === 0) return;
+
+  function parseStat(el) {
+    const rawVal = parseFloat(el.getAttribute('data-stat-value')) || 0;
+    const prefix = el.getAttribute('data-stat-prefix') || '';
+    const suffix = el.getAttribute('data-stat-suffix') || '';
+    const decimals = parseInt(el.getAttribute('data-stat-decimals') || (Number.isInteger(rawVal) ? '0' : '1'), 10);
+    const duration = parseFloat(el.getAttribute('data-stat-duration')) || 1.6;
+    return { target: rawVal, prefix, suffix, decimals, duration };
+  }
+
+  function animateStat(el) {
+    const { target, prefix, suffix, decimals, duration } = parseStat(el);
+    const startTime = performance.now();
+    const durationMs = duration * 1000;
+    el.classList.add('stat-counting');
+
+    function update(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1.0, elapsed / durationMs);
+
+      // Spring-like critically damped ease (matching useSpring bounce: 0)
+      // 1 - Math.pow(1 - progress, 3) gives an organic, responsive acceleration and smooth deceleration
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = eased * target;
+
+      el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+
+      if (progress < 1.0) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = `${prefix}${target.toFixed(decimals)}${suffix}`;
+        el.classList.remove('stat-counting');
+      }
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  // IntersectionObserver matching useInView(ref, { once: true, margin: "-100px" })
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateStat(entry.target);
+        obs.unobserve(entry.target); // once: true
+      }
+    });
+  }, {
+    rootMargin: '-50px 0px -50px 0px',
+    threshold: 0.15
+  });
+
+  elements.forEach(el => observer.observe(el));
+}
+
+// Also make animateStat available globally for dynamically updated cards
+window.animateDynamicStat = function(el, target, prefix = '', suffix = '', decimals = 0, duration = 1.2) {
+  if (!el) return;
+  const startTime = performance.now();
+  const durationMs = duration * 1000;
+
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(1.0, elapsed / durationMs);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = eased * target;
+    el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+    if (progress < 1.0) {
+      requestAnimationFrame(update);
+    } else {
+      el.textContent = `${prefix}${target.toFixed(decimals)}${suffix}`;
+    }
+  }
+  requestAnimationFrame(update);
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initStatsCounters);
+} else {
+  initStatsCounters();
+}
