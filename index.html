@@ -4399,7 +4399,7 @@ a:focus-visible, button:focus-visible {
 .perspective-carousel {
   position: relative;
   width: 100%;
-  height: 640px;
+  height: 670px;
   overflow: hidden;
   user-select: none;
   border-radius: var(--radius-lg);
@@ -4444,7 +4444,7 @@ a:focus-visible, button:focus-visible {
 .pc-track {
   position: absolute;
   left: 50%;
-  top: 47%;
+  top: 40%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -4841,12 +4841,13 @@ a:focus-visible, button:focus-visible {
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
-  .perspective-carousel { height: 620px; }
+  .perspective-carousel { height: 640px; }
   .pc-slide { width: 340px; }
 }
 @media (max-width: 768px) {
   .clients { padding: 64px 0; }
-  .perspective-carousel { height: 570px; border-radius: var(--radius); }
+  .perspective-carousel { height: 590px; border-radius: var(--radius); }
+  .pc-track { top: 39%; }
   .pc-slide { width: 285px; }
   .pc-card { min-height: 460px; }
   .pc-card__media { height: 135px; }
@@ -4859,7 +4860,8 @@ a:focus-visible, button:focus-visible {
 @media (max-width: 480px) {
   .clients { padding: 56px 0; }
   .clients__header { margin-bottom: 32px; }
-  .perspective-carousel { height: 530px; }
+  .perspective-carousel { height: 540px; }
+  .pc-track { top: 38%; }
   .pc-slide { width: 245px; }
   .pc-card { min-height: 420px; border-radius: 14px; }
   .pc-card__media { height: 115px; }

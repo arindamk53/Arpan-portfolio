@@ -1308,7 +1308,7 @@ initBookingSystem();
 
     // Center active slide: x: -(currentIndex * slideWidth + slideWidth / 2)
     const translateX = -(currentIndex * slideWidth + slideWidth / 2);
-    track.style.transform = `translateX(${translateX}px)`;
+    track.style.transform = `translateX(${translateX}px) translateY(-50%)`;
 
     slides.forEach((slide, index) => {
       const inner = slide.querySelector('.pc-card-wrap');
