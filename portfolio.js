@@ -1283,6 +1283,7 @@ initBookingSystem();
   const prevBtn = carousel.querySelector('.pc-btn--prev');
   const nextBtn = carousel.querySelector('.pc-btn--next');
   const dots = Array.from(carousel.querySelectorAll('.pc-dot'));
+  const counter = carousel.querySelector('#pc-counter');
 
   if (!track || slides.length === 0) return;
 
@@ -1291,21 +1292,21 @@ initBookingSystem();
   const loop = false;
 
   function getSlideWidth() {
-    return slides[0].getBoundingClientRect().width || (window.innerWidth <= 480 ? 235 : window.innerWidth <= 768 ? 270 : 320);
+    return slides[0].getBoundingClientRect().width || (window.innerWidth <= 480 ? 245 : window.innerWidth <= 768 ? 285 : 375);
   }
 
   function getRotationStep() {
-    if (window.innerWidth <= 480) return 26;
-    if (window.innerWidth <= 768) return 36;
-    return 48;
+    if (window.innerWidth <= 480) return 24;
+    if (window.innerWidth <= 768) return 32;
+    return 42;
   }
 
   function update() {
     const slideWidth = getSlideWidth();
     const rotationStep = getRotationStep();
-    const inactiveScale = window.innerWidth <= 480 ? 0.88 : 0.84;
+    const inactiveScale = window.innerWidth <= 480 ? 0.90 : 0.86;
 
-    // Center active slide: x: -(currentIndex * safeSlideWidth + safeSlideWidth / 2)
+    // Center active slide: x: -(currentIndex * slideWidth + slideWidth / 2)
     const translateX = -(currentIndex * slideWidth + slideWidth / 2);
     track.style.transform = `translateX(${translateX}px)`;
 
@@ -1317,7 +1318,7 @@ initBookingSystem();
       const rotateY = diff * rotationStep;
       const scale = isActive ? 1 : inactiveScale;
       const zIndex = 10 - Math.abs(diff);
-      const opacity = isActive ? 1 : Math.max(0.68, 1 - Math.abs(diff) * 0.22);
+      const opacity = isActive ? 1 : Math.max(0.72, 1 - Math.abs(diff) * 0.18);
 
       if (inner) {
         inner.style.transform = `rotateY(${rotateY}deg) scale(${scale})`;
@@ -1337,6 +1338,11 @@ initBookingSystem();
       dot.classList.toggle('pc-dot--active', isActive);
       dot.setAttribute('aria-current', isActive ? 'true' : 'false');
     });
+
+    // Update counter
+    if (counter) {
+      counter.textContent = String(currentIndex + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+    }
 
     // Update button states
     if (!loop) {
