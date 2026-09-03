@@ -1,0 +1,36 @@
+name: Security Audit & Code Health
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly security scan every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Dependency Audit & Syntax Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install production and dev dependencies
+        run: npm ci
+
+      - name: Run npm dependency vulnerability audit
+        run: npm audit --audit-level=high
+
+      - name: Validate server syntax
+        run: node -c server.js

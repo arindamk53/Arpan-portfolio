@@ -1,0 +1,9 @@
+# Global code ownership for critical infrastructure & source files
+* @arindamk53
+
+# High-sensitivity security paths
+/server.js @arindamk53
+/package.json @arindamk53
+/package-lock.json @arindamk53
+/.github/workflows/ @arindamk53
+/SECURITY.md @arindamk53
