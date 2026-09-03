@@ -125,7 +125,7 @@ body {
   font-family: 'DM Sans', system-ui, sans-serif;
   background: var(--white);
   color: var(--charcoal);
-  overflow-x: hidden;
+  overflow-x: clip;
   cursor: none;
   line-height: 1.6;
 }
@@ -3656,13 +3656,7 @@ a:focus-visible, button:focus-visible {
    ═══════════════════════════════════════════════════ */
 
 /* Override plain clients section background */
-.clients {
-  padding: 140px 0 !important;
-  background: var(--off-white) !important;
-  border-top: 1px solid var(--border) !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
+.clients { position: relative; overflow: visible !important; padding: 0; margin: 0; }
 .clients::before {
   content: ''; position: absolute;
   width: 700px; height: 700px;
@@ -4336,11 +4330,7 @@ a:focus-visible, button:focus-visible {
 /* ══════════════════════════════════════════════════════════
    REFINED PERSPECTIVE CAROUSEL — High Contrast & Elevated Layout
    ══════════════════════════════════════════════════════════ */
-.clients {
-  position: relative;
-  overflow: hidden;
-  padding: 96px 0;
-}
+.clients { position: relative; overflow: visible !important; padding: 0; margin: 0; }
 .clients__header {
   display: flex;
   align-items: flex-end;
@@ -5298,11 +5288,7 @@ a:focus-visible, button:focus-visible {
    SHADER DISSOLVE REVEAL — CLIENT SHOWCASE
    WebGL Sobel Edge Glow & Particle Dissolve
    ══════════════════════════════════════════════════════════ */
-.clients {
-  position: relative;
-  overflow: hidden;
-  padding: 96px 0;
-}
+.clients { position: relative; overflow: visible !important; padding: 0; margin: 0; }
 .clients__header {
   display: flex;
   align-items: flex-end;
@@ -6059,6 +6045,31 @@ a:focus-visible, button:focus-visible {
   .scroll-dissolve-card__title { font-size: 20px; }
   .scroll-dissolve-card__desc { font-size: 12px; }
   .scroll-dissolve-card__chips { display: none; }
+}
+
+/* Guarantee position: sticky functions relative to viewport */
+html, body {
+  overflow-x: clip !important;
+}
+.clients, #clients {
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+.scroll-dissolve-section {
+  position: relative !important;
+  width: 100% !important;
+  height: 420vh !important;
+  overflow: visible !important;
+}
+.scroll-dissolve-sticky {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  z-index: 20 !important;
 }
 </style>
 </head>
