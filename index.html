@@ -4333,7 +4333,7 @@ a:focus-visible, button:focus-visible {
 
 
 /* ══════════════════════════════════════════════════════════
-   REFINED PERSPECTIVE CAROUSEL — High Contrast & Rich Content
+   REFINED PERSPECTIVE CAROUSEL — High Contrast & Elevated Layout
    ══════════════════════════════════════════════════════════ */
 .clients {
   position: relative;
@@ -4344,7 +4344,7 @@ a:focus-visible, button:focus-visible {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
   gap: 32px;
   flex-wrap: wrap;
 }
@@ -4399,11 +4399,11 @@ a:focus-visible, button:focus-visible {
 .perspective-carousel {
   position: relative;
   width: 100%;
-  height: 670px;
+  height: 620px;
   overflow: hidden;
   user-select: none;
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(244, 243, 239, 0.85) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(244, 243, 239, 0.90) 100%);
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
@@ -4414,7 +4414,7 @@ a:focus-visible, button:focus-visible {
   filter: blur(90px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.25;
+  opacity: 0.22;
 }
 .pc-orb--1 {
   width: 480px;
@@ -4431,9 +4431,13 @@ a:focus-visible, button:focus-visible {
   right: 15%;
 }
 
+/* Viewport for 3D Stage - Stops 74px before bottom to give controls dedicated room */
 .pc-viewport {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 74px;
   overflow: hidden;
   perspective: 1200px;
   display: flex;
@@ -4444,8 +4448,8 @@ a:focus-visible, button:focus-visible {
 .pc-track {
   position: absolute;
   left: 50%;
-  top: 40%;
-  transform: translateY(-50%);
+  top: 48%;
+  transform: translate(var(--tx, 0px), -50%);
   display: flex;
   align-items: center;
   will-change: transform;
@@ -4454,7 +4458,7 @@ a:focus-visible, button:focus-visible {
 }
 .pc-slide {
   flex-shrink: 0;
-  width: 375px;
+  width: 365px;
   perspective: 1200px;
   padding: 0 12px;
   box-sizing: border-box;
@@ -4463,7 +4467,7 @@ a:focus-visible, button:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   transform-style: preserve-3d;
   will-change: transform, opacity;
   transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
@@ -4471,26 +4475,25 @@ a:focus-visible, button:focus-visible {
 }
 .pc-card {
   width: 100%;
-  min-height: 495px;
   border-radius: 18px;
   overflow: hidden;
   position: relative;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.10);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.09), 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
   transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
   display: flex;
   flex-direction: column;
   text-align: left;
 }
 .pc-card:hover {
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.14), 0 4px 14px rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.20);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.18);
 }
 
 /* Card Media Header */
 .pc-card__media {
-  height: 155px;
+  height: 135px;
   position: relative;
   overflow: hidden;
   background: #111115;
@@ -4505,7 +4508,7 @@ a:focus-visible, button:focus-visible {
 .pc-card__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.75) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.7) 100%);
   pointer-events: none;
 }
 .pc-card__gradient-banner {
@@ -4520,28 +4523,28 @@ a:focus-visible, button:focus-visible {
 }
 .pc-card__top-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 10px;
+  left: 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 4px 10px;
   border-radius: 9999px;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.70);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   color: #ffffff;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 500;
   border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 2;
 }
 .pc-card__platform-icon {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
@@ -4555,13 +4558,13 @@ a:focus-visible, button:focus-visible {
 }
 .pc-card__avatar-wrap {
   position: absolute;
-  bottom: -24px;
-  left: 20px;
-  width: 58px;
-  height: 58px;
+  bottom: -22px;
+  left: 18px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  border: 3.5px solid #ffffff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
   background: #000000;
   overflow: hidden;
   z-index: 3;
@@ -4576,7 +4579,7 @@ a:focus-visible, button:focus-visible {
 }
 .pc-card__avatar-wrap--ring {
   background: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
-  padding: 2.5px;
+  padding: 2px;
 }
 .pc-card__avatar-wrap--ring .pc-card__avatar {
   border-radius: 50%;
@@ -4584,14 +4587,13 @@ a:focus-visible, button:focus-visible {
 .pc-card__avatar-wrap--text {
   background: #1a1a1a;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
 }
 
 /* Card Body Content */
 .pc-card__body {
-  padding: 32px 22px 22px;
-  flex: 1;
+  padding: 26px 18px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -4600,7 +4602,7 @@ a:focus-visible, button:focus-visible {
 .pc-card__main-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 .pc-card__title-row {
   display: flex;
@@ -4610,7 +4612,7 @@ a:focus-visible, button:focus-visible {
 }
 .pc-card__title {
   font-family: 'DM Sans', sans-serif;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   color: #111111;
   margin: 0;
@@ -4620,10 +4622,10 @@ a:focus-visible, button:focus-visible {
   gap: 6px;
 }
 .pc-card__tag-pill {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 6px;
+  padding: 2px 7px;
+  border-radius: 5px;
   background: rgba(0, 0, 0, 0.05);
   color: #333333;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -4645,7 +4647,7 @@ a:focus-visible, button:focus-visible {
   border-color: rgba(16, 185, 129, 0.2);
 }
 .pc-card__handle {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #555555;
   margin: 0;
   font-weight: 500;
@@ -4653,21 +4655,21 @@ a:focus-visible, button:focus-visible {
 .pc-card__role-bar {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 7px;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 6px;
   background: #f4f3ef;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #222222;
-  margin: 4px 0 2px;
+  margin: 3px 0 2px;
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
 .pc-card__desc {
-  font-size: 13px;
-  line-height: 1.52;
+  font-size: 12.5px;
+  line-height: 1.48;
   color: #2e2e2e;
-  margin: 4px 0 10px;
+  margin: 3px 0 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -4678,18 +4680,18 @@ a:focus-visible, button:focus-visible {
 .pc-card__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 5px;
+  margin-bottom: 12px;
 }
 .pc-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 9px;
-  border-radius: 6px;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 5px;
   background: #f8f8f6;
   border: 1px solid rgba(0, 0, 0, 0.06);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
   color: #333333;
 }
@@ -4701,25 +4703,25 @@ a:focus-visible, button:focus-visible {
 .pc-card__stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
   background: #f7f6f2;
-  border-radius: 12px;
-  padding: 10px 14px;
+  border-radius: 10px;
+  padding: 8px 12px;
   border: 1px solid rgba(0, 0, 0, 0.06);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 .pc-stat-item__num {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: #111111;
   display: block;
 }
 .pc-stat-item__lbl {
-  font-size: 10.5px;
+  font-size: 10px;
   color: #555555;
   display: block;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   font-weight: 500;
 }
 
@@ -4728,23 +4730,23 @@ a:focus-visible, button:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   width: 100%;
-  padding: 11px 16px;
+  padding: 10px 14px;
   border-radius: 9999px;
   background: #1a1a1a;
   color: #ffffff !important;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   transition: background 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
   margin-top: auto;
 }
 .pc-card__cta:hover {
   background: #2e2e2e;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 .pc-card__cta svg {
   transition: transform 0.2s ease;
@@ -4756,7 +4758,7 @@ a:focus-visible, button:focus-visible {
 /* Slide Label Below Card */
 .pc-label {
   font-family: 'DM Sans', sans-serif;
-  font-size: 14.5px;
+  font-size: 13.5px;
   font-weight: 600;
   color: #111111;
   white-space: nowrap;
@@ -4765,41 +4767,41 @@ a:focus-visible, button:focus-visible {
   transition: filter 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Floating Controls Bar */
+/* Dedicated Navigation Controls Bar — Completely Below the 3D Stage */
 .pc-controls {
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 25;
+  z-index: 30;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  padding: 8px 18px;
+  padding: 7px 18px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
   color: #111111;
 }
 .pc-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #f3f3f0;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   color: #111111;
   cursor: pointer;
   transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s var(--ease-spring);
 }
 .pc-btn:hover:not(:disabled) {
-  background: #e6e5e0;
+  background: #e5e4de;
   transform: scale(1.08);
 }
 .pc-btn:active:not(:disabled) {
@@ -4834,45 +4836,47 @@ a:focus-visible, button:focus-visible {
   font-family: 'DM Sans', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: #555555;
+  color: #444444;
   letter-spacing: 0.04em;
   padding-left: 2px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {
-  .perspective-carousel { height: 640px; }
-  .pc-slide { width: 340px; }
+  .perspective-carousel { height: 610px; }
+  .pc-slide { width: 335px; }
+  .pc-viewport { bottom: 72px; }
 }
 @media (max-width: 768px) {
   .clients { padding: 64px 0; }
-  .perspective-carousel { height: 590px; border-radius: var(--radius); }
-  .pc-track { top: 39%; }
-  .pc-slide { width: 285px; }
-  .pc-card { min-height: 460px; }
-  .pc-card__media { height: 135px; }
-  .pc-card__body { padding: 26px 16px 16px; }
-  .pc-card__title { font-size: 18px; }
-  .pc-card__desc { font-size: 12px; }
+  .perspective-carousel { height: 560px; border-radius: var(--radius); }
+  .pc-viewport { bottom: 68px; }
+  .pc-slide { width: 280px; }
+  .pc-card__media { height: 120px; }
+  .pc-card__body { padding: 22px 14px 14px; }
+  .pc-card__title { font-size: 17px; }
+  .pc-card__desc { font-size: 11.5px; }
   .pc-card__chips { display: none; }
-  .pc-label { font-size: 13px; }
+  .pc-label { font-size: 12.5px; }
+  .pc-controls { bottom: 14px; gap: 10px; padding: 6px 14px; }
+  .pc-btn { width: 32px; height: 32px; }
 }
 @media (max-width: 480px) {
   .clients { padding: 56px 0; }
-  .clients__header { margin-bottom: 32px; }
-  .perspective-carousel { height: 540px; }
-  .pc-track { top: 38%; }
-  .pc-slide { width: 245px; }
-  .pc-card { min-height: 420px; border-radius: 14px; }
-  .pc-card__media { height: 115px; }
-  .pc-card__body { padding: 22px 14px 14px; }
-  .pc-card__title { font-size: 16px; }
-  .pc-card__role-bar { font-size: 10px; padding: 4px 7px; }
-  .pc-stat-item__num { font-size: 14px; }
-  .pc-stat-item__lbl { font-size: 9px; }
-  .pc-card__cta { padding: 9px 12px; font-size: 11.5px; }
+  .clients__header { margin-bottom: 28px; }
+  .perspective-carousel { height: 520px; }
+  .pc-viewport { bottom: 64px; }
+  .pc-slide { width: 240px; }
+  .pc-card { border-radius: 14px; }
+  .pc-card__media { height: 105px; }
+  .pc-card__body { padding: 20px 12px 12px; }
+  .pc-card__title { font-size: 15px; }
+  .pc-card__role-bar { font-size: 9.5px; padding: 3px 6px; }
+  .pc-stat-item__num { font-size: 13.5px; }
+  .pc-stat-item__lbl { font-size: 8.5px; }
+  .pc-card__cta { padding: 8px 12px; font-size: 11px; }
+  .pc-controls { bottom: 12px; }
 }
-
 </style>
 </head>
 <body>

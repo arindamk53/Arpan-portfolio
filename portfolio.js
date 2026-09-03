@@ -1292,7 +1292,7 @@ initBookingSystem();
   const loop = false;
 
   function getSlideWidth() {
-    return slides[0].getBoundingClientRect().width || (window.innerWidth <= 480 ? 245 : window.innerWidth <= 768 ? 285 : 375);
+    return slides[0].getBoundingClientRect().width || (window.innerWidth <= 480 ? 240 : window.innerWidth <= 768 ? 280 : 365);
   }
 
   function getRotationStep() {
@@ -1306,9 +1306,10 @@ initBookingSystem();
     const rotationStep = getRotationStep();
     const inactiveScale = window.innerWidth <= 480 ? 0.90 : 0.86;
 
-    // Center active slide: x: -(currentIndex * slideWidth + slideWidth / 2)
+    // Center active slide horizontally via CSS variable --tx
+    // This preserves translateY(-50%) defined in CSS perfectly!
     const translateX = -(currentIndex * slideWidth + slideWidth / 2);
-    track.style.transform = `translateX(${translateX}px) translateY(-50%)`;
+    track.style.setProperty('--tx', `${translateX}px`);
 
     slides.forEach((slide, index) => {
       const inner = slide.querySelector('.pc-card-wrap');
@@ -1318,7 +1319,7 @@ initBookingSystem();
       const rotateY = diff * rotationStep;
       const scale = isActive ? 1 : inactiveScale;
       const zIndex = 10 - Math.abs(diff);
-      const opacity = isActive ? 1 : Math.max(0.72, 1 - Math.abs(diff) * 0.18);
+      const opacity = isActive ? 1 : Math.max(0.70, 1 - Math.abs(diff) * 0.20);
 
       if (inner) {
         inner.style.transform = `rotateY(${rotateY}deg) scale(${scale})`;
@@ -1360,15 +1361,29 @@ initBookingSystem();
     update();
   }
 
-  if (prevBtn) prevBtn.addEventListener('click', () => selectSlide(currentIndex - 1));
-  if (nextBtn) nextBtn.addEventListener('click', () => selectSlide(currentIndex + 1));
+  if (prevBtn) prevBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectSlide(currentIndex - 1);
+  });
+  
+  if (nextBtn) nextBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectSlide(currentIndex + 1);
+  });
 
   dots.forEach((dot, index) => {
-    dot.addEventListener('click', () => selectSlide(index));
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectSlide(index);
+    });
   });
 
   slides.forEach((slide, index) => {
     slide.addEventListener('click', (e) => {
+      // Don't intercept clicks on links or buttons inside active slide
+      if (e.target.closest('a') || e.target.closest('button')) {
+        return;
+      }
       if (currentIndex !== index) {
         e.preventDefault();
         selectSlide(index);
@@ -1376,17 +1391,21 @@ initBookingSystem();
     });
   });
 
-  // Touch Swipe
-  let sx = 0, sy = 0;
+  // Touch Swipe with deliberate horizontal threshold to avoid accidental triggers
+  let sx = 0, sy = 0, isTouching = false;
   carousel.addEventListener('touchstart', (e) => {
     sx = e.touches[0].clientX;
     sy = e.touches[0].clientY;
+    isTouching = true;
   }, { passive: true });
 
   carousel.addEventListener('touchend', (e) => {
+    if (!isTouching) return;
+    isTouching = false;
     const dx = sx - e.changedTouches[0].clientX;
     const dy = Math.abs(sy - e.changedTouches[0].clientY);
-    if (Math.abs(dx) > 40 && dy < 60) {
+    // Only slide if horizontal swipe is clearly dominant and exceeds 55px
+    if (Math.abs(dx) > 55 && Math.abs(dx) > dy * 1.5) {
       selectSlide(dx > 0 ? currentIndex + 1 : currentIndex - 1);
     }
   }, { passive: true });
