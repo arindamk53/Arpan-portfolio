@@ -1582,3 +1582,581 @@ initBookingSystem();
   // Initial render
   update();
 })();
+
+// ════════════════════════════════════════════════════════════
+// SHADER DISSOLVE CLIENT SHOWCASE (Exact GLSL Shader Port)
+// ════════════════════════════════════════════════════════════
+(function () {
+  const stage = document.getElementById('shader-stage');
+  const canvas = document.getElementById('shader-canvas');
+  if (!stage || !canvas) return;
+
+  const clientData = [
+    {
+      badge: '01 / 03 · Featured YouTube Channel',
+      platform: 'YouTube Partner',
+      title: 'Pop Diaries',
+      handle: '@popdiaries · Entertainment & Culture',
+      scope: '🎯 Scope: Channel Setup, Branding & Video Strategy',
+      desc: 'Complete YouTube setup and visual identity for daily Bollywood buzz and pop culture, engineered for audience retention and scale.',
+      chips: ['Branding & Logo', 'Channel Architecture', 'Video Strategy', 'SEO Growth'],
+      stat1: '1.1M+', stat1Lbl: 'Subscribers',
+      stat2: '4.9K+', stat2Lbl: 'Videos Produced',
+      ctaText: 'View Live Channel',
+      ctaLink: 'https://youtube.com/@ipopdiaries'
+    },
+    {
+      badge: '02 / 03 · Creator Production Company',
+      platform: 'Instagram Creator',
+      title: 'MyRevue',
+      handle: '@myrevueapp · Content-First Presence',
+      scope: '🎬 Scope: Video Production & High-Impact Content',
+      desc: 'Designed and optimized a content-first Instagram presence that delivers value, builds credibility, and scales reach for 80+ top brands.',
+      chips: ['Brand Films', 'Creative Direction', 'Reels Systems', 'Creator Growth'],
+      stat1: '24.7K+', stat1Lbl: 'Followers',
+      stat2: '80+', stat2Lbl: 'Trusted Brands',
+      ctaText: 'Visit Instagram Profile',
+      ctaLink: 'https://instagram.com/myrevueapp'
+    },
+    {
+      badge: '03 / 03 · Personal Brand & Coaching',
+      platform: 'Mindvalley Coach',
+      title: 'theweekendyogi',
+      handle: 'Hitesh Goel · Wellness Commune',
+      scope: '🧘 Scope: Brand Identity, Content Flow & Systems',
+      desc: 'Shaped the visual presence and strategic content workflows for Hitesh Goel, building relatable personal branding with genuine audience connection.',
+      chips: ['Personal Brand', 'Visual Design', 'Content Systems', 'Community Growth'],
+      stat1: '8.68K+', stat1Lbl: 'Community',
+      stat2: '470+', stat2Lbl: 'Posts Published',
+      ctaText: 'Visit Instagram Profile',
+      ctaLink: 'https://instagram.com/theweekendyogi'
+    }
+  ];
+
+  // UI elements
+  const tabs = Array.from(document.querySelectorAll('.client-tab'));
+  const detailsEl = document.getElementById('shader-details');
+  const sBadge = document.getElementById('s-badge');
+  const sPlatform = document.getElementById('s-platform');
+  const sTitle = document.getElementById('s-title');
+  const sHandle = document.getElementById('s-handle');
+  const sScope = document.getElementById('s-scope');
+  const sDesc = document.getElementById('s-desc');
+  const sChips = document.getElementById('s-chips');
+  const sStat1 = document.getElementById('s-stat1');
+  const sStat1Lbl = document.getElementById('s-stat1-lbl');
+  const sStat2 = document.getElementById('s-stat2');
+  const sStat2Lbl = document.getElementById('s-stat2-lbl');
+  const sCta = document.getElementById('s-cta');
+  const sCtaText = document.getElementById('s-cta-text');
+  const prevBtn = document.querySelector('.shader-btn--prev');
+  const nextBtn = document.querySelector('.shader-btn--next');
+  const dots = Array.from(document.querySelectorAll('.shader-dot'));
+  const counter = document.getElementById('s-counter');
+
+  let currentIndex = 0;
+  let isTransitioning = false;
+
+  function updateCard(idx) {
+    const data = clientData[idx];
+
+    // Update active tab
+    tabs.forEach((tab, i) => {
+      const isActive = i === idx;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+
+    // Update dots
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === idx);
+    });
+
+    // Update counter
+    if (counter) {
+      counter.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(clientData.length).padStart(2, '0');
+    }
+
+    // Update buttons
+    if (prevBtn) prevBtn.disabled = idx === 0;
+    if (nextBtn) nextBtn.disabled = idx === clientData.length - 1;
+
+    // Update content with subtle fade
+    if (detailsEl) detailsEl.classList.add('updating');
+
+    setTimeout(() => {
+      if (sBadge) sBadge.textContent = data.badge;
+      if (sPlatform) sPlatform.textContent = data.platform;
+      if (sTitle) sTitle.textContent = data.title;
+      if (sHandle) sHandle.textContent = data.handle;
+      if (sScope) sScope.innerHTML = `<span>${data.scope}</span>`;
+      if (sDesc) sDesc.textContent = data.desc;
+      if (sStat1) sStat1.textContent = data.stat1;
+      if (sStat1Lbl) sStat1Lbl.textContent = data.stat1Lbl;
+      if (sStat2) sStat2.textContent = data.stat2;
+      if (sStat2Lbl) sStat2Lbl.textContent = data.stat2Lbl;
+      if (sCtaText) sCtaText.textContent = data.ctaText;
+      if (sCta) sCta.href = data.ctaLink;
+
+      if (sChips) {
+        sChips.innerHTML = data.chips.map(c => `<span class="pc-chip">${c}</span>`).join('');
+      }
+
+      if (detailsEl) detailsEl.classList.remove('updating');
+    }, 150);
+  }
+
+  // ── GLSL SHADERS (User's Exact Code) ──
+  const coverVertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `;
+
+  const coverFragmentShader = `
+    uniform sampler2D uTexture;
+    uniform vec2 uResolution;
+    uniform vec2 uImageResolution;
+    uniform float uDissolve;
+    uniform vec2 uCenter;
+    uniform float uTime;
+    uniform float uGrayscale;
+    uniform float uEdgeIntensity;
+    uniform float uEdgeBrightness;
+    varying vec2 vUv;
+
+    mat3 sobelX = mat3(
+      -1.0, 0.0, 1.0,
+      -2.0, 0.0, 2.0,
+      -1.0, 0.0, 1.0
+    );
+
+    mat3 sobelY = mat3(
+      -1.0, -2.0, -1.0,
+       0.0,  0.0,  0.0,
+       1.0,  2.0,  1.0
+    );
+
+    float getLuminance(vec3 color) {
+      return dot(color, vec3(0.299, 0.587, 0.114));
+    }
+
+    float sobel(sampler2D tex, vec2 uv, vec2 texelSize) {
+      float gx = 0.0;
+      float gy = 0.0;
+
+      for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+          vec2 offset = vec2(float(i), float(j)) * texelSize;
+          float lum = getLuminance(texture2D(tex, uv + offset).rgb);
+          gx += lum * sobelX[i + 1][j + 1];
+          gy += lum * sobelY[i + 1][j + 1];
+        }
+      }
+
+      return sqrt(gx * gx + gy * gy);
+    }
+
+    float hash(vec2 p) {
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+    }
+
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+      
+      float a = hash(i);
+      float b = hash(i + vec2(1.0, 0.0));
+      float c = hash(i + vec2(0.0, 1.0));
+      float d = hash(i + vec2(1.0, 1.0));
+      
+      return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+    }
+
+    float fbm(vec2 p) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      float frequency = 1.0;
+      
+      for (int i = 0; i < 5; i++) {
+        value += amplitude * noise(p * frequency);
+        amplitude *= 0.5;
+        frequency *= 2.0;
+      }
+      
+      return value;
+    }
+
+    void main() {
+      vec2 ratio = vec2(
+        min((uResolution.x / uResolution.y) / (uImageResolution.x / uImageResolution.y), 1.0),
+        min((uResolution.y / uResolution.x) / (uImageResolution.y / uImageResolution.x), 1.0)
+      );
+
+      vec2 uv = vec2(
+        vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+        vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+      );
+
+      vec4 texColor = texture2D(uTexture, uv);
+      
+      float gray = getLuminance(texColor.rgb);
+      vec3 grayscaleColor = vec3(gray);
+      texColor.rgb = mix(texColor.rgb, grayscaleColor, uGrayscale);
+      
+      vec2 centeredUv = vUv - uCenter;
+      float aspect = uResolution.x / uResolution.y;
+      centeredUv.x *= aspect;
+      float dist = length(centeredUv);
+      
+      float angle = atan(centeredUv.y, centeredUv.x);
+      
+      float noiseScale = 6.0;
+      vec2 pixelatedUv = floor(vUv * uResolution / noiseScale) * noiseScale / uResolution;
+      float blockNoise = fbm(pixelatedUv * 100.0) * 0.15;
+      
+      float angularNoise = fbm(vec2(angle * 5.0, 0.0)) * 0.15;
+      
+      float totalNoise = blockNoise + angularNoise;
+      float noisyDist = dist + totalNoise;
+      
+      float maxDist = length(vec2(aspect * 0.5, 0.5));
+      float normalizedDist = noisyDist / maxDist;
+      
+      float dissolveThreshold = uDissolve * 1.5; 
+      
+      vec2 texelSize = 1.0 / uResolution;
+      float edge = sobel(uTexture, uv, texelSize);
+      
+      edge = pow(edge, 0.7) * 2.0;
+      edge = clamp(edge, 0.0, 1.0);
+      
+      float dissolveMask = smoothstep(dissolveThreshold - 0.03, dissolveThreshold, normalizedDist);
+      
+      vec3 edgeColor = vec3(1.0, 1.0, 1.0);
+      
+      vec3 baseColor = mix(texColor.rgb, vec3(0.0), uGrayscale);
+      vec3 finalColor = baseColor;
+      
+      float edgeGlowIntensity = uEdgeIntensity * 2.0;
+      float edgeGlow = edge * edgeGlowIntensity * (1.0 + uGrayscale * 3.0);
+      finalColor += edgeColor * edgeGlow * uEdgeBrightness;
+      
+      float edgeZoneWidth = 0.15 * (1.0 - uDissolve) + 0.02;
+      float edgeZone = smoothstep(dissolveThreshold - edgeZoneWidth, dissolveThreshold - edgeZoneWidth + 0.04, normalizedDist) * 
+                       smoothstep(dissolveThreshold + 0.02, dissolveThreshold - 0.02, normalizedDist);
+      float sparkle = hash(floor(vUv * uResolution / 4.0)) * edgeZone;
+      
+      float edgeBrightness = (1.0 - uDissolve) * uEdgeBrightness * (1.0 + uGrayscale * 2.0);
+      finalColor += vec3(sparkle * 3.0 * edgeBrightness);
+      
+      float alpha = dissolveMask * texColor.a;
+
+      gl_FragColor = vec4(finalColor, alpha);
+    }
+  `;
+
+  const coverFragmentShaderReverse = `
+    uniform sampler2D uTexture;
+    uniform vec2 uResolution;
+    uniform vec2 uImageResolution;
+    uniform float uDissolve;
+    uniform vec2 uCenter;
+    uniform float uTime;
+    uniform float uBrightness;
+    uniform float uEdgeIntensity;
+    uniform float uDarkness;
+    uniform float uGrayscale;
+    varying vec2 vUv;
+
+    mat3 sobelX = mat3(
+      -1.0, 0.0, 1.0,
+      -2.0, 0.0, 2.0,
+      -1.0, 0.0, 1.0
+    );
+
+    mat3 sobelY = mat3(
+      -1.0, -2.0, -1.0,
+       0.0,  0.0,  0.0,
+       1.0,  2.0,  1.0
+    );
+
+    float getLuminance(vec3 color) {
+      return dot(color, vec3(0.299, 0.587, 0.114));
+    }
+
+    float sobel(sampler2D tex, vec2 uv, vec2 texelSize) {
+      float gx = 0.0;
+      float gy = 0.0;
+
+      for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+          vec2 offset = vec2(float(i), float(j)) * texelSize;
+          float lum = getLuminance(texture2D(tex, uv + offset).rgb);
+          gx += lum * sobelX[i + 1][j + 1];
+          gy += lum * sobelY[i + 1][j + 1];
+        }
+      }
+
+      return sqrt(gx * gx + gy * gy);
+    }
+
+    void main() {
+      vec2 ratio = vec2(
+        min((uResolution.x / uResolution.y) / (uImageResolution.x / uImageResolution.y), 1.0),
+        min((uResolution.y / uResolution.x) / (uImageResolution.y / uImageResolution.x), 1.0)
+      );
+
+      vec2 uv = vec2(
+        vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+        vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+      );
+
+      vec4 texColor = texture2D(uTexture, uv);
+      
+      float gray = getLuminance(texColor.rgb);
+      vec3 grayscaleColor = vec3(gray);
+      texColor.rgb = mix(texColor.rgb, grayscaleColor, uGrayscale);
+      
+      vec2 texelSize = 1.0 / uResolution;
+      float edge = sobel(uTexture, uv, texelSize);
+      
+      edge = pow(edge, 0.7) * 2.0;
+      edge = clamp(edge, 0.0, 1.0);
+      
+      vec3 edgeColor = vec3(1.0, 1.0, 1.0);
+      
+      vec3 darkBase = vec3(0.0);
+      vec3 baseColor = mix(texColor.rgb, darkBase, uDarkness);
+      
+      float edgeGlow = edge * uEdgeIntensity * 2.0;
+      baseColor += edgeColor * edgeGlow;
+      
+      vec3 finalColor = clamp(baseColor, 0.0, 1.0);
+
+      gl_FragColor = vec4(finalColor, texColor.a);
+    }
+  `;
+
+  if (typeof THREE === 'undefined') return;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+  camera.position.set(0, 0, 1);
+
+  const textureLoader = new THREE.TextureLoader();
+  const texturePaths = [
+    '/client_popdiaries.jpg',
+    '/client_myrevue.jpg',
+    '/client_theweekendyogi.jpg'
+  ];
+
+  let loadedTextures = [];
+  let loadedCount = 0;
+
+  texturePaths.forEach((path, i) => {
+    textureLoader.load(path, (tex) => {
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      loadedTextures[i] = tex;
+      loadedCount++;
+      if (loadedCount === texturePaths.length) {
+        initShaderMeshes();
+      }
+    });
+  });
+
+  let material1, material2, mesh1, mesh2;
+  const clock = new THREE.Clock();
+
+  function getCanvasSize() {
+    const rect = canvas.getBoundingClientRect();
+    return { width: rect.width || 600, height: rect.height || 450 };
+  }
+
+  function initShaderMeshes() {
+    const size = getCanvasSize();
+    renderer.setSize(size.width, size.height);
+
+    const uniforms1 = {
+      uTexture: { value: loadedTextures[0] },
+      uResolution: { value: new THREE.Vector2(size.width, size.height) },
+      uImageResolution: { value: new THREE.Vector2(1200, 800) },
+      uDissolve: { value: 0.0 },
+      uCenter: { value: new THREE.Vector2(0.5, 0.5) },
+      uTime: { value: 0.0 },
+      uGrayscale: { value: 0.0 },
+      uEdgeIntensity: { value: 0.0 },
+      uEdgeBrightness: { value: 1.0 },
+    };
+
+    const uniforms2 = {
+      uTexture: { value: loadedTextures[1] },
+      uResolution: { value: new THREE.Vector2(size.width, size.height) },
+      uImageResolution: { value: new THREE.Vector2(1200, 800) },
+      uDissolve: { value: 0.0 },
+      uCenter: { value: new THREE.Vector2(0.5, 0.5) },
+      uTime: { value: 0.0 },
+      uBrightness: { value: 0.0 },
+      uEdgeIntensity: { value: 0.6 },
+      uDarkness: { value: 1.0 },
+      uGrayscale: { value: 1.0 },
+    };
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+
+    material2 = new THREE.ShaderMaterial({
+      vertexShader: coverVertexShader,
+      fragmentShader: coverFragmentShaderReverse,
+      uniforms: uniforms2,
+      transparent: true,
+      depthWrite: false
+    });
+    mesh2 = new THREE.Mesh(geometry, material2);
+    mesh2.position.set(0, 0, -0.1);
+    scene.add(mesh2);
+
+    material1 = new THREE.ShaderMaterial({
+      vertexShader: coverVertexShader,
+      fragmentShader: coverFragmentShader,
+      uniforms: uniforms1,
+      transparent: true,
+      depthWrite: false
+    });
+    mesh1 = new THREE.Mesh(geometry, material1);
+    mesh1.position.set(0, 0, 0);
+    scene.add(mesh1);
+
+    animateShader();
+  }
+
+  let dissolveVal = 0.0;
+  let targetDissolve = 0.0;
+  let currentFrontTexIdx = 0;
+  let currentBackTexIdx = 1;
+
+  function triggerTransition(nextIdx) {
+    if (nextIdx === currentIndex || isTransitioning) return;
+    isTransitioning = true;
+
+    const prevIdx = currentIndex;
+    currentIndex = nextIdx;
+    updateCard(currentIndex);
+
+    if (!material1 || !material2) {
+      isTransitioning = false;
+      return;
+    }
+
+    // Set front mesh to current image, back mesh to target image
+    material1.uniforms.uTexture.value = loadedTextures[prevIdx];
+    material2.uniforms.uTexture.value = loadedTextures[nextIdx];
+
+    const startTime = performance.now();
+    const duration = 1100; // 1.1s dissolve transition
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1.0, elapsed / duration);
+      // Smooth cubic ease out
+      const eased = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      dissolveVal = eased;
+
+      // Update shader uniforms matching the exact React component
+      material1.uniforms.uDissolve.value = dissolveVal;
+      material1.uniforms.uGrayscale.value = Math.min(1.0, dissolveVal / 0.4);
+      material1.uniforms.uEdgeIntensity.value = dissolveVal * 0.5;
+      material1.uniforms.uEdgeBrightness.value = 1.0 - dissolveVal;
+
+      const accelerated = Math.min(1.0, dissolveVal * 1.1);
+      material2.uniforms.uEdgeIntensity.value = 0.6 * (1.0 - accelerated);
+      material2.uniforms.uDarkness.value = 1.0 - accelerated;
+      material2.uniforms.uGrayscale.value = 1.0 - accelerated;
+
+      if (progress < 1.0) {
+        requestAnimationFrame(step);
+      } else {
+        // Transition finished: set front mesh to new image at rest
+        material1.uniforms.uTexture.value = loadedTextures[nextIdx];
+        material1.uniforms.uDissolve.value = 0.0;
+        material1.uniforms.uGrayscale.value = 0.0;
+        material1.uniforms.uEdgeIntensity.value = 0.0;
+        material1.uniforms.uEdgeBrightness.value = 1.0;
+
+        const nextFutureIdx = (nextIdx + 1) % loadedTextures.length;
+        material2.uniforms.uTexture.value = loadedTextures[nextFutureIdx];
+        material2.uniforms.uEdgeIntensity.value = 0.6;
+        material2.uniforms.uDarkness.value = 1.0;
+        material2.uniforms.uGrayscale.value = 1.0;
+
+        dissolveVal = 0.0;
+        isTransitioning = false;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Tab click handlers
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => triggerTransition(index));
+  });
+
+  // Dot click handlers
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => triggerTransition(index));
+  });
+
+  // Prev / Next buttons
+  if (prevBtn) prevBtn.addEventListener('click', () => {
+    if (currentIndex > 0) triggerTransition(currentIndex - 1);
+  });
+  if (nextBtn) nextBtn.addEventListener('click', () => {
+    if (currentIndex < clientData.length - 1) triggerTransition(currentIndex + 1);
+  });
+
+  // Touch Swipe on stage
+  let touchStartX = 0, touchStartY = 0;
+  stage.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  stage.addEventListener('touchend', (e) => {
+    const dx = touchStartX - e.changedTouches[0].clientX;
+    const dy = Math.abs(touchStartY - e.changedTouches[0].clientY);
+    if (Math.abs(dx) > 50 && Math.abs(dx) > dy * 1.5) {
+      if (dx > 0 && currentIndex < clientData.length - 1) {
+        triggerTransition(currentIndex + 1);
+      } else if (dx < 0 && currentIndex > 0) {
+        triggerTransition(currentIndex - 1);
+      }
+    }
+  }, { passive: true });
+
+  function onResize() {
+    if (!renderer) return;
+    const size = getCanvasSize();
+    renderer.setSize(size.width, size.height);
+    if (material1) material1.uniforms.uResolution.value.set(size.width, size.height);
+    if (material2) material2.uniforms.uResolution.value.set(size.width, size.height);
+  }
+  window.addEventListener('resize', onResize, { passive: true });
+
+  function animateShader() {
+    requestAnimationFrame(animateShader);
+    const time = clock.getElapsedTime();
+    if (material1) material1.uniforms.uTime.value = time;
+    if (material2) material2.uniforms.uTime.value = time;
+    renderer.render(scene, camera);
+  }
+
+  // Initial state
+  updateCard(0);
+})();
