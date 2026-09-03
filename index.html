@@ -5707,6 +5707,359 @@ a:focus-visible, button:focus-visible {
   .shader-details__desc { font-size: 12.5px; }
   .shader-details__chips { display: none; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   SCROLL DISSOLVE REVEAL — EXACT SHADER IMPLEMENTATION
+   h-[300vh] sticky top-0 h-screen WebGL Canvas
+   ══════════════════════════════════════════════════════════ */
+.clients {
+  position: relative;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
+}
+.scroll-dissolve-section {
+  position: relative;
+  width: 100%;
+  height: 300vh; /* Exactly matches h-[300vh] in the React component */
+}
+.scroll-dissolve-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #0b0b0e;
+}
+
+/* Fullscreen WebGL Canvas */
+#scroll-dissolve-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  z-index: 1;
+}
+
+/* Cinematic Scrim Gradient to guarantee readability of theme text */
+.scroll-dissolve-scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 80% 50%, rgba(10, 10, 14, 0.2) 0%, rgba(10, 10, 14, 0.75) 100%),
+              linear-gradient(180deg, rgba(10, 10, 14, 0.85) 0%, rgba(10, 10, 14, 0.2) 25%, rgba(10, 10, 14, 0.2) 75%, rgba(10, 10, 14, 0.9) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Section Header (Fixed inside sticky screen at top) */
+.scroll-dissolve-header {
+  position: absolute;
+  top: 40px;
+  left: 50px;
+  right: 50px;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  pointer-events: none;
+}
+.scroll-dissolve-header__text {
+  max-width: 500px;
+}
+.scroll-dissolve-header .label {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+}
+.scroll-dissolve-header__headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 3.8vw, 52px);
+  font-weight: 300;
+  line-height: 1.1;
+  color: #ffffff;
+  margin: 10px 0 6px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+}
+.scroll-dissolve-header__headline em {
+  font-style: italic;
+  font-weight: 300;
+  color: #fce7f3;
+}
+.scroll-dissolve-header__sub {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.8);
+}
+.scroll-dissolve-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 12px;
+  font-weight: 500;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+.scroll-dissolve-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  display: inline-block;
+}
+
+/* Floating High-End Glass Case Study Card (Matches theme with maximum readability) */
+.scroll-dissolve-card {
+  position: absolute;
+  bottom: 44px;
+  left: 50px;
+  z-index: 10;
+  width: 440px;
+  max-width: calc(100% - 40px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  padding: 28px 26px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45), 0 4px 16px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.scroll-dissolve-card.updating {
+  opacity: 0.3;
+  transform: translateY(6px);
+}
+.scroll-dissolve-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.scroll-dissolve-card__pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111111;
+  background: #f4f3ef;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+.scroll-dissolve-card__platform {
+  font-size: 11px;
+  font-weight: 600;
+  color: #E11D48;
+  background: rgba(225, 29, 72, 0.08);
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(225, 29, 72, 0.18);
+}
+.scroll-dissolve-card__title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.scroll-dissolve-card__handle {
+  font-size: 13px;
+  color: #555555;
+  font-weight: 500;
+  margin: -6px 0 0;
+}
+.scroll-dissolve-card__scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  background: #f5f4ef;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #1a1a1a;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.scroll-dissolve-card__desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #2b2b2b;
+  margin: 2px 0 4px;
+}
+.scroll-dissolve-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.scroll-dissolve-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: #f7f6f2;
+  border-radius: 12px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-top: 2px;
+}
+.scroll-dissolve-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 9999px;
+  background: #111111;
+  color: #ffffff !important;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  margin-top: 4px;
+}
+.scroll-dissolve-card__cta:hover {
+  background: #2c2c2c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+
+/* Scroll Journey Scrub & Step Indicators (Right Side) */
+.scroll-dissolve-scrub {
+  position: absolute;
+  right: 50px;
+  bottom: 50px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  pointer-events: auto;
+}
+.scroll-dissolve-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(15, 15, 20, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.scroll-step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: all 0.3s ease;
+  color: #ffffff;
+}
+.scroll-step-item.active {
+  opacity: 1;
+}
+.scroll-step-item__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+.scroll-step-item.active .scroll-step-item__dot {
+  background: #38bdf8;
+  transform: scale(1.4);
+  box-shadow: 0 0 10px #38bdf8;
+}
+.scroll-step-item__name {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.scroll-dissolve-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.scroll-dissolve-mouse {
+  width: 14px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  position: relative;
+}
+.scroll-dissolve-mouse::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 5px;
+  background: #ffffff;
+  border-radius: 2px;
+  animation: mouseWheel 1.6s infinite;
+}
+@keyframes mouseWheel {
+  0% { transform: translate(-50%, 0); opacity: 1; }
+  100% { transform: translate(-50%, 8px); opacity: 0; }
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .scroll-dissolve-header { top: 24px; left: 24px; right: 24px; }
+  .scroll-dissolve-card { left: 24px; bottom: 24px; width: 380px; padding: 22px; }
+  .scroll-dissolve-scrub { right: 24px; bottom: 24px; }
+}
+@media (max-width: 768px) {
+  .scroll-dissolve-section { height: 260vh; }
+  .scroll-dissolve-header { top: 16px; left: 16px; right: 16px; }
+  .scroll-dissolve-header__headline { font-size: 28px; }
+  .scroll-dissolve-header__sub { display: none; }
+  .scroll-dissolve-badge { padding: 6px 12px; font-size: 11px; }
+  .scroll-dissolve-scrub {
+    top: 80px;
+    right: 16px;
+    bottom: auto;
+  }
+  .scroll-dissolve-steps { padding: 8px 12px; gap: 8px; }
+  .scroll-step-item__name { font-size: 11px; }
+  .scroll-dissolve-indicator { display: none; }
+  .scroll-dissolve-card {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+    max-width: none;
+    padding: 18px 16px;
+  }
+  .scroll-dissolve-card__title { font-size: 20px; }
+  .scroll-dissolve-card__desc { font-size: 12px; }
+  .scroll-dissolve-card__chips { display: none; }
+}
 </style>
 </head>
 <body>
@@ -5911,115 +6264,96 @@ a:focus-visible, button:focus-visible {
 
 <!-- ── CLIENTS ── -->
 <section class="clients" id="clients">
-  <div class="clients__header">
-    <div class="clients__header-text">
-      <span class="label reveal">Trusted By</span>
-      <h2 class="clients__headline reveal reveal-delay-1">Featured <em>Clients</em></h2>
-      <p class="clients__sub reveal reveal-delay-2">Select or browse below to explore client case studies with interactive shader dissolve transitions.</p>
-    </div>
-    <div class="clients__header-badge reveal reveal-delay-2">
-      <span class="clients__live-dot"></span>
-      <span>WebGL Shader Reveal</span>
-    </div>
-  </div>
+  <!-- Exact h-[300vh] scroll container driven by scroll progress -->
+  <div class="scroll-dissolve-section" id="scroll-dissolve-container">
+    
+    <!-- Exact sticky top-0 h-screen full-page viewport -->
+    <div class="scroll-dissolve-sticky" id="scroll-dissolve-sticky">
+      
+      <!-- Exact WebGL Canvas running the custom GLSL shaders -->
+      <canvas id="scroll-dissolve-canvas"></canvas>
+      <div class="scroll-dissolve-scrim"></div>
 
-  <!-- ALL 3 CLIENT NAMES ARE VISIBLE RIGHT HERE -->
-  <div class="client-tabs reveal reveal-delay-1" role="tablist" aria-label="Client Case Studies">
-    <button type="button" class="client-tab active" role="tab" aria-selected="true" data-index="0">
-      <span class="client-tab__num">01</span>
-      <span>Pop Diaries</span>
-      <span class="client-tab__badge">YouTube</span>
-    </button>
-    <button type="button" class="client-tab" role="tab" aria-selected="false" data-index="1">
-      <span class="client-tab__num">02</span>
-      <span>MyRevue</span>
-      <span class="client-tab__badge">Agency</span>
-    </button>
-    <button type="button" class="client-tab" role="tab" aria-selected="false" data-index="2">
-      <span class="client-tab__num">03</span>
-      <span>theweekendyogi</span>
-      <span class="client-tab__badge">Coaching</span>
-    </button>
-  </div>
-
-  <!-- SHOWCASE STAGE: WebGL Shader Canvas (Left) + Rich Details Panel (Right) -->
-  <div class="shader-stage reveal reveal-delay-2" id="shader-stage">
-    <div class="shader-orb shader-orb--1"></div>
-    <div class="shader-orb shader-orb--2"></div>
-
-    <!-- Left: WebGL Shader Canvas -->
-    <div class="shader-canvas-wrap">
-      <canvas id="shader-canvas"></canvas>
-      <div class="shader-canvas__hint">
-        <span class="shader-canvas__hint-dot"></span>
-        <span>GLSL Sobel Edge &amp; Particle Dissolve</span>
+      <!-- Top Header -->
+      <div class="scroll-dissolve-header">
+        <div class="scroll-dissolve-header__text">
+          <span class="label">Trusted By</span>
+          <h2 class="scroll-dissolve-header__headline">Featured <em>Clients</em></h2>
+          <p class="scroll-dissolve-header__sub">Scroll down to experience shader dissolve transitions between client case studies.</p>
+        </div>
+        <div class="scroll-dissolve-badge">
+          <span class="scroll-dissolve-live-dot"></span>
+          <span>Scroll Dissolve Reveal</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Right: Glass Case Study Details Panel -->
-    <div class="shader-details" id="shader-details">
-      <div class="shader-details__content" id="shader-content">
-        <div class="shader-details__meta">
-          <span class="shader-details__num-badge" id="s-badge">01 / 03 · Featured YouTube Channel</span>
-          <span class="shader-details__platform" id="s-platform">YouTube Partner</span>
+      <!-- Floating Case Study Details Card (Updates with active client) -->
+      <div class="scroll-dissolve-card" id="sd-card">
+        <div class="scroll-dissolve-card__header">
+          <span class="scroll-dissolve-card__pill" id="sd-pill">01 / 03 · Featured YouTube Channel</span>
+          <span class="scroll-dissolve-card__platform" id="sd-platform">YouTube Partner</span>
         </div>
 
-        <h3 class="shader-details__title" id="s-title">Pop Diaries</h3>
-        <p class="shader-details__handle" id="s-handle">@popdiaries · Entertainment &amp; Culture</p>
+        <h3 class="scroll-dissolve-card__title" id="sd-title">Pop Diaries</h3>
+        <p class="scroll-dissolve-card__handle" id="sd-handle">@popdiaries · Entertainment &amp; Culture</p>
 
-        <div class="shader-details__scope-bar" id="s-scope">
+        <div class="scroll-dissolve-card__scope" id="sd-scope">
           <span>🎯 Scope: Channel Setup, Branding &amp; Video Strategy</span>
         </div>
 
-        <p class="shader-details__desc" id="s-desc">
+        <p class="scroll-dissolve-card__desc" id="sd-desc">
           Complete YouTube setup and visual identity for daily Bollywood buzz and pop culture, engineered for audience retention and scale.
         </p>
 
-        <div class="shader-details__chips" id="s-chips">
+        <div class="scroll-dissolve-card__chips" id="sd-chips">
           <span class="pc-chip">Branding &amp; Logo</span>
           <span class="pc-chip">Channel Architecture</span>
           <span class="pc-chip">Video Strategy</span>
           <span class="pc-chip">SEO Growth</span>
         </div>
 
-        <div class="shader-details__stats">
+        <div class="scroll-dissolve-card__stats">
           <div class="pc-stat-item">
-            <span class="pc-stat-item__num" id="s-stat1">1.1M+</span>
-            <span class="pc-stat-item__lbl" id="s-stat1-lbl">Subscribers</span>
+            <span class="pc-stat-item__num" id="sd-stat1">1.1M+</span>
+            <span class="pc-stat-item__lbl" id="sd-stat1-lbl">Subscribers</span>
           </div>
           <div class="pc-stat-item">
-            <span class="pc-stat-item__num" id="s-stat2">4.9K+</span>
-            <span class="pc-stat-item__lbl" id="s-stat2-lbl">Videos Produced</span>
+            <span class="pc-stat-item__num" id="sd-stat2">4.9K+</span>
+            <span class="pc-stat-item__lbl" id="sd-stat2-lbl">Videos Produced</span>
           </div>
         </div>
 
-        <a href="https://youtube.com/@ipopdiaries" target="_blank" rel="noopener noreferrer" class="shader-details__cta" id="s-cta">
-          <span id="s-cta-text">View Live Channel</span>
+        <a href="https://youtube.com/@ipopdiaries" target="_blank" rel="noopener noreferrer" class="scroll-dissolve-card__cta" id="sd-cta">
+          <span id="sd-cta-text">View Live Channel</span>
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
       </div>
 
-      <!-- Bottom Controls Bar -->
-      <div class="shader-controls">
-        <div class="shader-controls__buttons">
-          <button type="button" class="shader-btn shader-btn--prev" aria-label="Previous Client">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-          </button>
-          <button type="button" class="shader-btn shader-btn--next" aria-label="Next Client">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
+      <!-- Right: Step Indicators with ALL 3 CLIENT NAMES + Scroll prompt -->
+      <div class="scroll-dissolve-scrub">
+        <div class="scroll-dissolve-steps">
+          <div class="scroll-step-item active" data-step="0">
+            <span class="scroll-step-item__dot"></span>
+            <span class="scroll-step-item__name">01 · Pop Diaries</span>
+          </div>
+          <div class="scroll-step-item" data-step="1">
+            <span class="scroll-step-item__dot"></span>
+            <span class="scroll-step-item__name">02 · MyRevue</span>
+          </div>
+          <div class="scroll-step-item" data-step="2">
+            <span class="scroll-step-item__dot"></span>
+            <span class="scroll-step-item__name">03 · theweekendyogi</span>
+          </div>
         </div>
 
-        <div class="shader-dots">
-          <button type="button" class="shader-dot active" aria-label="Client 1: Pop Diaries" data-index="0"></button>
-          <button type="button" class="shader-dot" aria-label="Client 2: MyRevue" data-index="1"></button>
-          <button type="button" class="shader-dot" aria-label="Client 3: theweekendyogi" data-index="2"></button>
+        <div class="scroll-dissolve-indicator">
+          <div class="scroll-dissolve-mouse"></div>
+          <span>Scroll to dissolve</span>
         </div>
-
-        <span class="shader-counter" id="s-counter">01 / 03</span>
       </div>
-    </div><!-- /shader-details -->
-  </div><!-- /shader-stage -->
+
+    </div><!-- /scroll-dissolve-sticky -->
+  </div><!-- /scroll-dissolve-section -->
 </section>
 
 <!-- ── WORK / PORTFOLIO ── -->
